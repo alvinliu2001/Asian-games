@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Title -->
+    <title>TPBL TEAM TAIWAN 名古屋亞運文案工具</title>
+    <link rel="icon" href="https://tpbl.basketball/favicon.png">
+    <link rel="apple-touch-icon" href="assets/team-taiwan-apple-touch-icon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .sidebar-item.active { background-color: #D8BF98; color: #19191A; font-weight: 700; }
+        .sidebar-item:hover { color: #ffffff !important; }
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+        .bg-brand-dark { background-color: #19191A; }
+        .bg-brand-gold { background-color: #D8BF98; }
+        .disabled-input { background-color: #f3f4f6; cursor: not-allowed; color: #9ca3af; }
+        select {
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem !important;
+        }
+        .fade-out { opacity: 0; transition: opacity 0.5s ease-out; pointer-events: none; }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen overflow-hidden">
+
+    <div id="landing-page" class="fixed inset-0 z-50 bg-brand-dark flex flex-col md:flex-row overflow-hidden">
+        <div class="w-full md:w-1/2 h-full flex flex-col justify-center px-8 md:px-24 relative z-10 bg-brand-dark overflow-y-auto">
+            <div class="flex-1 flex flex-col justify-center min-h-[400px]">
+                <div class="mb-6 flex justify-start"><img src="https://raw.githubusercontent.com/alvinliu2001/tpbl-tool/refs/heads/main/tpbl-logo-white.png" alt="TPBL Logo" class="h-10 md:h-12 w-auto"></div>
+                <h1 class="text-3xl md:text-4xl font-semibold text-white mb-3 tracking-wide text-left">名古屋亞運文案生成工具</h1>
+                <p class="text-gray-400 text-lg md:text-xl mb-10 font-extralight text-left">希望每次值班都能早點下班</p>
+                <div class="flex justify-start">
+                    <button onclick="enterApp()" class="bg-brand-gold text-brand-dark text-lg font-bold py-3 px-12 rounded-full hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg flex items-center gap-2">開始使用 <span>→</span></button>
+                </div>
+            </div>
+            <div class="py-6 text-gray-600 text-xs flex flex-col items-center">
+                <p>powered by Alvin LIU</p>
+                <p>© TPBL 2026 All rights reserved.</p>
+            </div>
+        </div>
+        <div class="hidden md:block w-1/2 h-full relative overflow-hidden bg-blue-950">
+             <img src="assets/asian-games-landing-placeholder.jpg" alt="2026 Aichi-Nagoya Asian Games" class="w-full h-full object-cover object-center">
+        </div>
+    </div>
+
+    <div id="app-container" class="hidden w-full h-full flex flex-col md:flex-row overflow-hidden fixed inset-0 z-0">
+        <aside class="w-full md:w-64 bg-brand-dark text-gray-400 flex flex-col flex-shrink-0 md:h-full z-50 shadow-lg md:shadow-none">
+            <div class="p-4 md:p-6 border-b border-gray-800 flex justify-between items-center bg-brand-dark z-50">
+                <img src="https://raw.githubusercontent.com/alvinliu2001/tpbl-tool/refs/heads/main/tpbl-logo-white.png" alt="TPBL Logo" class="h-6 md:h-7 w-auto cursor-pointer" onclick="location.reload()">
+            </div>
+            <nav id="sidebar-nav" class="flex flex-col py-4 space-y-1 bg-brand-dark flex-1">
+                <div class="px-4 py-2 text-xs font-bold text-gray-600 uppercase tracking-wider">名古屋亞運模式</div>
+                <button onclick="switchMode('today_preview')" id="btn-today_preview" class="sidebar-item w-full text-left px-6 py-3 hover:bg-gray-800 transition flex items-center gap-3"><i class="fa-solid fa-calendar-day w-6 text-center"></i> 今日賽事預告</button>
+                <button onclick="switchMode('final_score')" id="btn-final_score" class="sidebar-item w-full text-left px-6 py-3 hover:bg-gray-800 transition flex items-center gap-3"><i class="fa-solid fa-flag-checkered w-6 text-center"></i> 終場比分</button>
+                <button onclick="switchMode('game_highlight')" id="btn-game_highlight" class="sidebar-item w-full text-left px-6 py-3 hover:bg-gray-800 transition flex items-center gap-3"><i class="fa-solid fa-film w-6 text-center"></i> 本場賽事精華</button>
+                <button onclick="switchMode('potg')" id="btn-potg" class="sidebar-item w-full text-left px-6 py-3 hover:bg-gray-800 transition flex items-center gap-3"><i class="fa-solid fa-bolt w-6 text-center"></i> 單場最佳球員</button>
+            </nav>
+        </aside>
+
+        <main class="flex-1 flex flex-col md:flex-row relative overflow-y-auto md:overflow-hidden w-full h-full">
+            <div class="flex-1 p-4 md:p-8 bg-white md:h-full md:overflow-y-auto">
+                <div class="max-w-2xl mx-auto pb-10">
+                    <h2 id="current-title" class="text-xl md:text-2xl font-bold mb-6 text-gray-800 border-l-4 border-brand-gold pl-4 flex items-center gap-3"><span id="title-text">請選擇功能</span></h2>
+                    <div id="dynamic-form" class="space-y-5"></div>
+                    <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col gap-4">
+                        <button onclick="generateCopy()" class="w-full bg-brand-dark hover:bg-brand-gold hover:text-brand-dark text-white font-bold py-4 px-6 rounded-lg transition shadow-lg">生成文案</button>
+                        <button onclick="clearCacheAndReset()" class="text-xs text-red-400 hover:text-red-600 font-medium transition flex items-center gap-1 self-start"><i class="fa-solid fa-rotate-right"></i> 重置暫存</button>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/3 bg-gray-100 p-6 flex flex-col border-t md:border-l border-gray-200">
+                <h3 class="text-lg font-bold mb-4 text-gray-700">預覽結果</h3>
+                <textarea id="output-text" class="flex-1 w-full p-4 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-gold bg-white leading-relaxed h-80 md:h-auto" placeholder="文案將顯示於此..."></textarea>
+                <button onclick="copyToClipboard()" class="mt-4 w-full bg-white border-2 border-gray-200 hover:border-brand-dark text-gray-800 font-bold py-3 px-4 rounded-lg transition duration-200 flex justify-center items-center gap-2"><span id="copy-text">一鍵複製</span></button>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        const TEAMS = {
+            "TEAM TAIWAN": { full: "TEAM TAIWAN", emoji: "🇹🇼" },
+            "約旦": { full: "約旦", emoji: "🇯🇴" },
+            "伊朗": { full: "伊朗", emoji: "🇮🇷" },
+            "卡達": { full: "卡達", emoji: "🇶🇦" }
+        };
+
+        const PLAYOFF_SCHEDULE = [
+            { id: "AG1", squad: "TEAM TAIWAN", date: "2026-09-10", time: "12:00", opponent: "約旦", arena: "愛知國際體育館 IG Arena" },
+            { id: "AG2", squad: "TEAM TAIWAN", date: "2026-09-12", time: "09:00", opponent: "伊朗", arena: "愛知國際體育館 IG Arena" },
+            { id: "AG3", squad: "TEAM TAIWAN", date: "2026-09-13", time: "12:00", opponent: "卡達", arena: "愛知國際體育館 IG Arena" }
+        ];
+        const CHRONOLOGICAL_SCHEDULE = [...PLAYOFF_SCHEDULE].sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
+
+        const STORAGE_PREFIX = 'tpbl_asian_games_2026_v1_';
+        let currentMode = '';
+
+        const toMathBoldSerif = (text) => {
+            const map = {
+                'A':'𝐀','B':'𝐁','C':'𝐂','D':'𝐃','E':'𝐄','F':'𝐅','G':'𝐆','H':'𝐇','I':'𝐈','J':'𝐉','K':'𝐊','L':'𝐋','M':'𝐌','N':'𝐍','O':'𝐎','P':'𝐏','Q':'𝐐','R':'𝐑','S':'𝐒','T':'𝐓','U':'𝐔','V':'𝐕','W':'𝐖','X':'𝐗','Y':'𝐘','Z':'𝐙',
+                'a':'𝐚','b':'ｂ','c':'𝐜','d':'𝐝','e':'𝐞','f':'𝐟','g':'ｇ','h':'ｈ','i':'ｉ','j':'ｊ','k':'𝐤','l':'ｌ','m':'ｍ','n':'ｎ','o':'ｏ','p':'ｐ','q':'ｑ','r':'ｒ','s':'ｓ','t':'ｔ','u':'ｕ','v':'ｖ','w':'ｗ','x':'ｘ','y':'ｙ','z':'𝐳',
+                '0':'𝟎','1':'𝟏','2':'𝟐','3':'𝟑','4':'𝟒','5':'𝟓','6':'𝟔','7':'𝟕','8':'𝟖','9':'𝟗'
+            };
+            return String(text).split('').map(char => map[char] || char).join('');
+        };
+        const toMathBoldSans = (text) => {
+            const sansMap = { 'N':'𝗡','E':'𝗘','X':'𝗫','T':'𝗧','G':'𝗚','A':'𝗔','M':'𝗠' };
+            return String(text).split('').map(char => sansMap[char] || char).join('');
+        };
+        
+        const parseDateLocal = (s) => { if(!s) return new Date(); const p = s.split('-'); return new Date(p[0], p[1]-1, p[2]); };
+        const getDayEngBold = (dateStr) => { 
+            const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
+            return toMathBoldSerif(days[parseDateLocal(dateStr).getDay()]);
+        };
+        const getDayZh = (dateStr) => ["日", "一", "二", "三", "四", "五", "六"][parseDateLocal(dateStr).getDay()];
+        const formatPlayoffDate = (s) => { 
+            const d = parseDateLocal(s); 
+            const m = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][d.getMonth()];
+            return toMathBoldSerif(`${m}.${String(d.getDate()).padStart(2,'0')}`);
+        };
+        const formatBracketDate = (s) => {
+            const d = parseDateLocal(s);
+            return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+        }
+        const getValue = (id) => document.getElementById(id)?.value || "";
+        const getTeam = (k) => TEAMS[k] || { full: k, emoji: "", arena: "" };
+        const getSquadLabel = () => 'TEAM TAIWAN';
+
+        function enterApp() { document.getElementById('landing-page').classList.add('fade-out'); setTimeout(() => { document.getElementById('landing-page').style.display = 'none'; document.getElementById('app-container').classList.remove('hidden'); }, 500); }
+        function toggleSidebar() { const nav = document.getElementById('sidebar-nav'); nav.classList.toggle('max-h-0'); }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`btn-${mode}`)?.classList.add('active');
+            const titles = { 'today_preview':'今日賽事預告', 'final_score':'終場比分', 'game_highlight':'本場賽事精華', 'potg':'單場最佳球員' };
+            document.getElementById('title-text').innerText = titles[mode];
+            renderForm(mode); bindSmartEvents(mode); loadFromLocal(); generateCopy();
+        }
+
+        function renderForm(mode) {
+            const container = document.getElementById('dynamic-form');
+            let html = '';
+            const gameSelect = `<div><label class="block text-sm font-medium text-gray-700 mb-1">選擇名古屋亞運場次</label><select id="game_select" class="w-full p-2.5 border border-gray-300 rounded-md bg-white"><option value="" disabled selected>請選擇場次</option>${CHRONOLOGICAL_SCHEDULE.map(g => `<option value="${g.id}">${g.date}｜${g.time}｜TEAM TAIWAN vs ${g.opponent}</option>`).join('')}</select></div>`;
+            const dates = [...new Set(PLAYOFF_SCHEDULE.map(g => g.date))];
+            const dateSelect = `<div><label class="block text-sm font-medium text-gray-700 mb-1">選擇賽事日期</label><select id="game_select" class="w-full p-2.5 border border-gray-300 rounded-md bg-white"><option value="" disabled selected>請選擇日期</option>${dates.map(date => `<option value="${date}">${date}（${getDayZh(date)}）</option>`).join('')}</select></div>`;
+
+            if (mode === 'today_preview') {
+                html = dateSelect + `
+                    ${createInput('m_broadcast','轉播平台','text','','愛爾達體育 @elta_sports')}
+                    ${createInput('m_photo_credit','照片來源','text','請輸入照片來源','')}
+                    ${createTextarea('m_intro','當日引言文案','請輸入當日對戰與賽事重點',8)}
+                `;
+            } else if (mode === 'final_score') {
+                html = gameSelect + createInput('fs_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports');
+            } else if (mode === 'game_highlight') {
+                html = createTextarea('hl_title', '精華文案', '請輸入球員姓名、精彩表現與賽事描述',5) + createInput('hl_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports');
+            } else if (mode === 'potg') {
+                html = gameSelect + createInput('potg_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports');
+            }
+            container.innerHTML = html;
+        }
+
+        const createInput = (id, l, type="text", ph="", v="") => `<div><label class="block text-sm font-medium text-gray-700 mb-1">${l}</label><input type="${type}" id="${id}" class="w-full p-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-gold" placeholder="${ph}" value="${v}"></div>`;
+        const createTextarea = (id, l, ph="", r=4) => `<div><label class="block text-sm font-medium text-gray-700 mb-1">${l}</label><textarea id="${id}" rows="${r}" class="w-full p-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-gold" placeholder="${ph}"></textarea></div>`;
+
+        function bindSmartEvents(mode) {
+            const form = document.getElementById('dynamic-form');
+            if (form) {
+                form.addEventListener('input', () => { generateCopy(); saveToLocal(); });
+                form.addEventListener('change', () => { generateCopy(); saveToLocal(); });
+            }
+            const gs = document.getElementById('game_select');
+            if (gs) {
+                gs.addEventListener('change', (e) => {
+                    const game = PLAYOFF_SCHEDULE.find(g => g.id === e.target.value);
+                    generateCopy();
+                });
+            }
+        }
+
+        function generateCopy() {
+            const v = getValue; let out = "";
+            const common_tags = "#TPBL #TEAMTAIWAN #2026名古屋亞運 #20THASIANGAMES #AICHINAGOYA2026";
+            const gid = v('game_select');
+            const game = PLAYOFF_SCHEDULE.find(g => g.id === gid);
+            const dayGames = PLAYOFF_SCHEDULE.filter(g => g.date === gid).sort((a, b) => a.time.localeCompare(b.time));
+            
+            if (currentMode === 'today_preview' && dayGames.length) {
+                const date = parseDateLocal(gid);
+                const scheduleLines = dayGames.map(g => {
+                    return `${g.time}｜TEAM TAIWAN vs ${g.opponent} ${getTeam(g.opponent).emoji}`;
+                }).join('\n');
+                out = `🇹🇼 ${toMathBoldSerif('TEAM TAIWAN')}｜${toMathBoldSerif('GAMEDAY')}\n\n${v('m_intro')}\n\n照片來源：${v('m_photo_credit')}\n\n-\n\n🗓️ 今日賽程：\n\n${date.getMonth() + 1}/${date.getDate()}（${getDayZh(gid)}）\n${scheduleLines}\n\n📍 賽事地點｜${dayGames[0].arena}`;
+                if (v('m_broadcast')) out += `\n📺 轉播平台｜${v('m_broadcast')}`;
+                out += `\n\n${common_tags}`;
+            } else if (currentMode === 'final_score' && game) {
+                const gameIdx = CHRONOLOGICAL_SCHEDULE.findIndex(g => g.id === game.id);
+                const next = CHRONOLOGICAL_SCHEDULE[gameIdx + 1];
+                const date = parseDateLocal(game.date);
+                const opponent = getTeam(game.opponent);
+                out = `🇹🇼 ${toMathBoldSerif('TEAM TAIWAN')}｜${toMathBoldSerif('FINAL')} 終場比分\n\n${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}（${getDayZh(game.date)}）${game.time}\n${getSquadLabel()} vs ${game.opponent} ${opponent.emoji} @ ${game.arena}\n\n-`;
+                if(next) {
+                    const nextDate = parseDateLocal(next.date);
+                    out += `\n\n📆 下場賽事：\n${nextDate.getMonth() + 1}/${nextDate.getDate()}（${getDayZh(next.date)}）${next.time} ${getSquadLabel()} vs ${next.opponent} ${getTeam(next.opponent).emoji}`;
+                }
+                out += `\n\n📍 賽事地點｜${game.arena}`;
+                if (v('fs_broadcast')) out += `\n📺 轉播平台｜${v('fs_broadcast')}`;
+                out += `\n\n${common_tags}`;
+            } else if (currentMode === 'game_highlight') {
+                out = `🇹🇼｜${v('hl_title')}\n\n-`;
+                if (v('hl_broadcast')) out += `\n\n📺 轉播平台｜${v('hl_broadcast')}`;
+                out += `\n\n${common_tags}`;
+            } else if (currentMode === 'potg' && game) {
+                const gameIdx = CHRONOLOGICAL_SCHEDULE.findIndex(g => g.id === game.id);
+                const next = CHRONOLOGICAL_SCHEDULE[gameIdx + 1];
+                const date = parseDateLocal(game.date);
+                out = `🇹🇼 ${toMathBoldSerif('TEAM TAIWAN')}｜${toMathBoldSerif('PLAYER OF THE GAME')}\n\n${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}（${getDayZh(game.date)}）${game.time}\n${getSquadLabel()} vs ${game.opponent} ${getTeam(game.opponent).emoji} @ ${game.arena}\n\n-`;
+                if(next) {
+                    const nextDate = parseDateLocal(next.date);
+                    out += `\n\n📆 下場賽事：\n${nextDate.getMonth() + 1}/${nextDate.getDate()}（${getDayZh(next.date)}）${next.time} ${getSquadLabel()} vs ${next.opponent} ${getTeam(next.opponent).emoji}`;
+                }
+                out += `\n\n📍 賽事地點｜${game.arena}`;
+                if (v('potg_broadcast')) out += `\n📺 轉播平台｜${v('potg_broadcast')}`;
+                out += `\n\n${common_tags}`;
+            }
+            document.getElementById('output-text').value = out;
+        }
+
+        function saveToLocal() { if (!currentMode) return; const d = {}; document.querySelectorAll('#dynamic-form input, #dynamic-form select, #dynamic-form textarea').forEach(el => { d[el.id] = el.value; }); localStorage.setItem(STORAGE_PREFIX + currentMode, JSON.stringify(d)); localStorage.setItem('tpbl_asian_games_last_mode', currentMode); }
+        function loadFromLocal() { const raw = localStorage.getItem(STORAGE_PREFIX + currentMode); if(raw) { const d = JSON.parse(raw); Object.keys(d).forEach(id => { const el = document.getElementById(id); if(el) el.value = d[id]; }); } }
+        function clearCacheAndReset() { localStorage.removeItem(STORAGE_PREFIX + currentMode); switchMode(currentMode); }
+        function copyToClipboard() { const el = document.getElementById("output-text"); el.select(); document.execCommand("copy"); const btn = document.getElementById("copy-text"); btn.innerText = "已複製！"; setTimeout(() => btn.innerText = "一鍵複製", 2000); }
+        window.onload = () => { const last = localStorage.getItem('tpbl_asian_games_last_mode') || 'today_preview'; switchMode(last); };
+    </script>
+</body>
+</html>
