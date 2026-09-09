@@ -61,6 +61,7 @@
                 <button onclick="switchMode('today_preview')" id="btn-today_preview" class="sidebar-item w-full text-left px-6 py-3 hover:bg-gray-800 transition flex items-center gap-3"><i class="fa-solid fa-calendar-day w-6 text-center"></i> 今日賽事預告</button>
                 <button onclick="switchMode('final_score')" id="btn-final_score" class="sidebar-item w-full text-left px-6 py-3 hover:bg-gray-800 transition flex items-center gap-3"><i class="fa-solid fa-flag-checkered w-6 text-center"></i> 終場比分</button>
                 <button onclick="switchMode('game_highlight')" id="btn-game_highlight" class="sidebar-item w-full text-left px-6 py-3 hover:bg-gray-800 transition flex items-center gap-3"><i class="fa-solid fa-film w-6 text-center"></i> 本場賽事精華</button>
+                <button onclick="switchMode('game_moments')" id="btn-game_moments" class="sidebar-item w-full text-left px-6 py-3 hover:bg-gray-800 transition flex items-center gap-3"><i class="fa-solid fa-camera w-6 text-center"></i> 精彩畫面</button>
                 <button onclick="switchMode('potg')" id="btn-potg" class="sidebar-item w-full text-left px-6 py-3 hover:bg-gray-800 transition flex items-center gap-3"><i class="fa-solid fa-bolt w-6 text-center"></i> 單場最佳球員</button>
             </nav>
         </aside>
@@ -141,7 +142,7 @@
             currentMode = mode;
             document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
             document.getElementById(`btn-${mode}`)?.classList.add('active');
-            const titles = { 'today_preview':'今日賽事預告', 'final_score':'終場比分', 'game_highlight':'本場賽事精華', 'potg':'單場最佳球員' };
+            const titles = { 'today_preview':'今日賽事預告', 'final_score':'終場比分', 'game_highlight':'本場賽事精華', 'game_moments':'精彩畫面', 'potg':'單場最佳球員' };
             document.getElementById('title-text').innerText = titles[mode];
             renderForm(mode); bindSmartEvents(mode); loadFromLocal(); generateCopy();
         }
@@ -163,6 +164,8 @@
                 html = gameSelect + createInput('fs_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports');
             } else if (mode === 'game_highlight') {
                 html = createTextarea('hl_title', '精華文案', '請輸入球員姓名、精彩表現與賽事描述',5) + createInput('hl_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports');
+            } else if (mode === 'game_moments') {
+                html = gameSelect + createInput('gm_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports');
             } else if (mode === 'potg') {
                 html = gameSelect + createInput('potg_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports');
             }
@@ -218,6 +221,18 @@
             } else if (currentMode === 'game_highlight') {
                 out = `🇹🇼｜${v('hl_title')}\n\n-`;
                 if (v('hl_broadcast')) out += `\n\n📺 轉播平台｜${v('hl_broadcast')}`;
+                out += `\n\n${common_tags}`;
+            } else if (currentMode === 'game_moments' && game) {
+                const gameIdx = CHRONOLOGICAL_SCHEDULE.findIndex(g => g.id === game.id);
+                const next = CHRONOLOGICAL_SCHEDULE[gameIdx + 1];
+                const date = parseDateLocal(game.date);
+                out = `🇹🇼 ${toMathBoldSerif('TEAM TAIWAN')}｜${toMathBoldSerif('GAME MOMENTS')} 精彩時刻 📸\n\n${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}（${getDayZh(game.date)}）${game.time}\n${getSquadLabel()} vs ${game.opponent} ${getTeam(game.opponent).emoji} @ ${game.arena}\n\n-`;
+                if(next) {
+                    const nextDate = parseDateLocal(next.date);
+                    out += `\n\n📆 下場賽事：\n${nextDate.getMonth() + 1}/${nextDate.getDate()}（${getDayZh(next.date)}）${next.time} ${getSquadLabel()} vs ${next.opponent} ${getTeam(next.opponent).emoji}`;
+                }
+                out += `\n\n📍 賽事地點｜${game.arena}`;
+                if (v('gm_broadcast')) out += `\n📺 轉播平台｜${v('gm_broadcast')}`;
                 out += `\n\n${common_tags}`;
             } else if (currentMode === 'potg' && game) {
                 const gameIdx = CHRONOLOGICAL_SCHEDULE.findIndex(g => g.id === game.id);
