@@ -100,7 +100,7 @@
         ];
         const CHRONOLOGICAL_SCHEDULE = [...PLAYOFF_SCHEDULE].sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
-        const STORAGE_PREFIX = 'tpbl_asian_games_2026_v1_';
+        const STORAGE_PREFIX = 'tpbl_asian_games_2026_v2_';
         let currentMode = '';
 
         const toMathBoldSerif = (text) => {
@@ -157,17 +157,17 @@
             if (mode === 'today_preview') {
                 html = dateSelect + `
                     ${createInput('m_broadcast','轉播平台','text','','愛爾達體育 @elta_sports')}
-                    ${createInput('m_photo_credit','照片來源','text','請輸入照片來源','')}
+                    ${createInput('m_photo_credit','照片來源','text','請輸入照片來源','@ctbaofficial')}
                     ${createTextarea('m_intro','當日引言文案','請輸入當日對戰與賽事重點',8)}
                 `;
             } else if (mode === 'final_score') {
-                html = gameSelect + createInput('fs_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports');
+                html = gameSelect + createInput('fs_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports') + createInput('fs_photo_credit','照片來源','text','請輸入照片來源','WOWSight @wowsightsport');
             } else if (mode === 'game_highlight') {
-                html = createTextarea('hl_title', '精華文案', '請輸入球員姓名、精彩表現與賽事描述',5) + createInput('hl_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports');
+                html = createTextarea('hl_title', '精華文案', '請輸入球員姓名、精彩表現與賽事描述',5) + createInput('hl_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports') + createInput('hl_photo_credit','照片來源','text','請輸入照片來源','WOWSight @wowsightsport');
             } else if (mode === 'game_moments') {
-                html = gameSelect + createInput('gm_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports');
+                html = gameSelect + createInput('gm_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports') + createInput('gm_photo_credit','照片來源','text','請輸入照片來源','WOWSight @wowsightsport');
             } else if (mode === 'potg') {
-                html = gameSelect + createInput('potg_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports');
+                html = gameSelect + createInput('potg_broadcast', '轉播平台','text','','愛爾達體育 @elta_sports') + createInput('potg_photo_credit','照片來源','text','請輸入照片來源','WOWSight @wowsightsport');
             }
             container.innerHTML = html;
         }
@@ -210,7 +210,7 @@
                 const next = CHRONOLOGICAL_SCHEDULE[gameIdx + 1];
                 const date = parseDateLocal(game.date);
                 const opponent = getTeam(game.opponent);
-                out = `🇹🇼 ${toMathBoldSerif('TEAM TAIWAN')}｜${toMathBoldSerif('FINAL')} 終場比分\n\n${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}（${getDayZh(game.date)}）${game.time}\n${getSquadLabel()} vs ${game.opponent} ${opponent.emoji} @ ${game.arena}\n\n-`;
+                out = `🇹🇼 ${toMathBoldSerif('TEAM TAIWAN')}｜${toMathBoldSerif('FINAL')} 終場比分\n\n${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}（${getDayZh(game.date)}）${game.time}\n${getSquadLabel()} vs ${game.opponent} ${opponent.emoji} @ ${game.arena}\n\n照片來源：${v('fs_photo_credit')}\n\n-`;
                 if(next) {
                     const nextDate = parseDateLocal(next.date);
                     out += `\n\n📆 下場賽事：\n${nextDate.getMonth() + 1}/${nextDate.getDate()}（${getDayZh(next.date)}）${next.time} ${getSquadLabel()} vs ${next.opponent} ${getTeam(next.opponent).emoji}`;
@@ -219,14 +219,14 @@
                 if (v('fs_broadcast')) out += `\n📺 轉播平台｜${v('fs_broadcast')}`;
                 out += `\n\n${common_tags}`;
             } else if (currentMode === 'game_highlight') {
-                out = `🇹🇼｜${v('hl_title')}\n\n-`;
+                out = `🇹🇼｜${v('hl_title')}\n\n照片來源：${v('hl_photo_credit')}\n\n-`;
                 if (v('hl_broadcast')) out += `\n\n📺 轉播平台｜${v('hl_broadcast')}`;
                 out += `\n\n${common_tags}`;
             } else if (currentMode === 'game_moments' && game) {
                 const gameIdx = CHRONOLOGICAL_SCHEDULE.findIndex(g => g.id === game.id);
                 const next = CHRONOLOGICAL_SCHEDULE[gameIdx + 1];
                 const date = parseDateLocal(game.date);
-                out = `🇹🇼 ${toMathBoldSerif('TEAM TAIWAN')}｜${toMathBoldSerif('GAME MOMENTS')} 精彩時刻 📸\n\n${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}（${getDayZh(game.date)}）${game.time}\n${getSquadLabel()} vs ${game.opponent} ${getTeam(game.opponent).emoji} @ ${game.arena}\n\n-`;
+                out = `🇹🇼 ${toMathBoldSerif('TEAM TAIWAN')}｜${toMathBoldSerif('GAME MOMENTS')} 精彩時刻 📸\n\n${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}（${getDayZh(game.date)}）${game.time}\n${getSquadLabel()} vs ${game.opponent} ${getTeam(game.opponent).emoji} @ ${game.arena}\n\n照片來源：${v('gm_photo_credit')}\n\n-`;
                 if(next) {
                     const nextDate = parseDateLocal(next.date);
                     out += `\n\n📆 下場賽事：\n${nextDate.getMonth() + 1}/${nextDate.getDate()}（${getDayZh(next.date)}）${next.time} ${getSquadLabel()} vs ${next.opponent} ${getTeam(next.opponent).emoji}`;
@@ -238,7 +238,7 @@
                 const gameIdx = CHRONOLOGICAL_SCHEDULE.findIndex(g => g.id === game.id);
                 const next = CHRONOLOGICAL_SCHEDULE[gameIdx + 1];
                 const date = parseDateLocal(game.date);
-                out = `🇹🇼 ${toMathBoldSerif('TEAM TAIWAN')}｜${toMathBoldSerif('PLAYER OF THE GAME')}\n\n${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}（${getDayZh(game.date)}）${game.time}\n${getSquadLabel()} vs ${game.opponent} ${getTeam(game.opponent).emoji} @ ${game.arena}\n\n-`;
+                out = `🇹🇼 ${toMathBoldSerif('TEAM TAIWAN')}｜${toMathBoldSerif('PLAYER OF THE GAME')}\n\n${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}（${getDayZh(game.date)}）${game.time}\n${getSquadLabel()} vs ${game.opponent} ${getTeam(game.opponent).emoji} @ ${game.arena}\n\n照片來源：${v('potg_photo_credit')}\n\n-`;
                 if(next) {
                     const nextDate = parseDateLocal(next.date);
                     out += `\n\n📆 下場賽事：\n${nextDate.getMonth() + 1}/${nextDate.getDate()}（${getDayZh(next.date)}）${next.time} ${getSquadLabel()} vs ${next.opponent} ${getTeam(next.opponent).emoji}`;
